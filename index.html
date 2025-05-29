@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DamPDF - File Compression Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f0f6fb;
+            color: #323334;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: #1b76ff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 80px 0;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .tagline {
+            font-size: 24px;
+            color: #8c949d;
+            margin-bottom: 40px;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .tool-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+        
+        .tool-icon {
+            width: 60px;
+            height: 60px;
+            background: #1b76ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .tool-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .tool-description {
+            color: #8c949d;
+            line-height: 1.5;
+        }
+        
+        .coming-soon {
+            background: #e3f2fd;
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: #1976d2;
+            font-size: 14px;
+            margin-top: 15px;
+            display: inline-block;
+        }
+        
+        footer {
+            background: #323334;
+            color: white;
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 80px;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 32px; }
+            .tagline { font-size: 18px; }
+            .tools-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">D</div>
+                <div class="logo-text">DamPDF</div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="hero">
+                <h1>DamPDF</h1>
+                <p class="tagline">Smarter. Smaller. Simpler.</p>
+                <p>Fast, secure, and free online file compression and conversion tools.</p>
+                
+                <div class="tools-grid">
+                    <div class="tool-card" onclick="showComingSoon('Image Compressor')">
+                        <div class="tool-icon">🖼️</div>
+                        <div class="tool-name">Image Compressor</div>
+                        <div class="tool-description">Reduce image file size while maintaining quality. Support for JPG, PNG, and WEBP formats.</div>
+                        <div class="coming-soon">Coming Soon</div>
+                    </div>
+                    
+                    <div class="tool-card" onclick="showComingSoon('PDF Compressor')">
+                        <div class="tool-icon">📄</div>
+                        <div class="tool-name">PDF Compressor</div>
+                        <div class="tool-description">Compress PDF files to reduce size without losing quality. Perfect for email attachments.</div>
+                        <div class="coming-soon">Coming Soon</div>
+                    </div>
+                    
+                    <div class="tool-card" onclick="showComingSoon('DOCX to PDF')">
+                        <div class="tool-icon">📝</div>
+                        <div class="tool-name">DOCX to PDF</div>
+                        <div class="tool-description">Convert Word documents to PDF format. Fast and reliable conversion.</div>
+                        <div class="coming-soon">Coming Soon</div>
+                    </div>
+                    
+                    <div class="tool-card" onclick="showComingSoon('Excel to PDF')">
+                        <div class="tool-icon">📊</div>
+                        <div class="tool-name">Excel to PDF</div>
+                        <div class="tool-description">Convert Excel spreadsheets to PDF format. Preserve formatting and layout.</div>
+                        <div class="coming-soon">Coming Soon</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <h3>DamPDF</h3>
+            <p>The fastest and most secure way to compress and convert your files online.</p>
+            <p>&copy; 2024 DamPDF. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function showComingSoon(toolName) {
+            alert(`${toolName} functionality will be available soon! 🚀\n\nYour backend API is ready at:\nhttps://dampdf-railway-production.up.railway.app`);
+        }
+    </script>
+</body>
+</html>
