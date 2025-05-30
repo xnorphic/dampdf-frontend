@@ -1385,6 +1385,7 @@
         let currentTool = '';
         let sessionId = '';
         let downloadUrl = '';
+        let processingInterval = null;
 
         // Enhanced animations and micro-interactions
         function addClickAnimation(element) {
@@ -1439,17 +1440,36 @@
         }
 
         function closeModal() {
+            // Clear any ongoing processing
+            if (processingInterval) {
+                clearTimeout(processingInterval);
+                processingInterval = null;
+            }
+            
             document.getElementById('toolModal').style.display = 'none';
             resetTool();
         }
 
         function resetTool() {
+            // Clear any ongoing polling
+            if (processingInterval) {
+                clearTimeout(processingInterval);
+                processingInterval = null;
+            }
+            
+            // Reset UI state
             document.getElementById('uploadSection').style.display = 'block';
             document.getElementById('progressBar').style.display = 'none';
             document.getElementById('progressText').style.display = 'none';
             document.getElementById('result').style.display = 'none';
             document.getElementById('errorMessage').style.display = 'none';
             document.getElementById('fileInput').value = '';
+            
+            // Clear progress
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressText').textContent = '';
+            
+            // Reset variables
             sessionId = '';
             downloadUrl = '';
         }
@@ -1539,8 +1559,8 @@
                 
                 updateProgress(10, 'Preparing secure upload...');
 
-                // Simulate file processing for demo (replace with actual API calls)
-                await simulateProcessing(file);
+                // Real API call to upload file
+                await uploadAndProcessFile(file);
 
             } catch (error) {
                 console.error('Error:', error);
@@ -1549,56 +1569,181 @@
             }
         }
 
-        function validateFileType(file, toolType) {
-            const fileType = file.type.toLowerCase();
-            const fileName = file.name.toLowerCase();
-            
-            switch (toolType) {
-                case 'image-compress':
-                    return fileType.includes('image/') || 
-                           fileName.endsWith('.jpg') || 
-                           fileName.endsWith('.jpeg') || 
-                           fileName.endsWith('.png') || 
-                           fileName.endsWith('.webp');
-                case 'pdf-compress':
-                    return fileType.includes('pdf') || fileName.endsWith('.pdf');
-                case 'docx-to-pdf':
-                    return fileType.includes('document') || 
-                           fileName.endsWith('.doc') || 
-                           fileName.endsWith('.docx');
-                case 'xlsx-to-pdf':
-                    return fileType.includes('sheet') || 
-                           fileName.endsWith('.xls') || 
-                           fileName.endsWith('.xlsx');
-                default:
-                    return true;
+        async function uploadAndProcessFile(file) {
+            try {
+                // Upload file to Railway backend
+                updateProgress(20, 'Uploading file to secure servers...');
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const uploadResponse = await fetch(`${API_BASE_URL}/files/upload?tool_type=${currentTool}`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+
+                if (!uploadResponse.ok) {
+                    const errorText = await uploadResponse.text();
+                    let errorMessage = `Upload failed (${uploadResponse.status})`;
+                    
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.error?.message || errorData.message || errorMessage;
+                    } catch (e) {
+                        errorMessage = errorText || errorMessage;
+                    }
+                    
+                    throw new Error(errorMessage);
+                }
+
+                const uploadData = await uploadResponse.json();
+                sessionId = uploadData.session_id;
+                
+                updateProgress(40, 'File uploaded successfully. Starting processing...');
+
+                // Start processing
+                const processResponse = await fetch(`${API_BASE_URL}/process/start`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        tool_type: currentTool,
+                        options: getToolOptions()
+                    })
+                });
+
+                if (!processResponse.ok) {
+                    const errorText = await processResponse.text();
+                    let errorMessage = `Processing failed (${processResponse.status})`;
+                    
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.error?.message || errorData.message || errorMessage;
+                    } catch (e) {
+                        errorMessage = errorText || errorMessage;
+                    }
+                    
+                    throw new Error(errorMessage);
+                }
+
+                updateProgress(60, 'Processing your file with advanced algorithms...');
+                
+                // Poll for processing status
+                await pollProcessingStatus();
+
+            } catch (error) {
+                console.error('Upload/Process Error:', error);
+                throw error;
             }
         }
 
-        async function simulateProcessing(file) {
-            // Simulate upload progress
-            updateProgress(30, 'File uploaded successfully. Starting processing...');
-            await new Promise(resolve => setTimeout(resolve, 1000));
+        function getToolOptions() {
+            switch (currentTool) {
+                case 'image-compress':
+                    return { 
+                        quality: 80,
+                        format: 'auto',
+                        optimization: 'balanced'
+                    };
+                case 'pdf-compress':
+                    return { 
+                        compression_level: 'medium',
+                        image_quality: 80,
+                        preserve_bookmarks: true
+                    };
+                case 'docx-to-pdf':
+                    return {
+                        preserve_formatting: true,
+                        embed_fonts: true
+                    };
+                case 'xlsx-to-pdf':
+                    return {
+                        preserve_formatting: true,
+                        include_charts: true,
+                        page_orientation: 'auto'
+                    };
+                default:
+                    return {};
+            }
+        }
+
+        async function pollProcessingStatus() {
+            let attempts = 0;
+            const maxAttempts = 120; // 2 minute timeout
             
-            updateProgress(50, 'Processing your file with advanced algorithms...');
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            const poll = async () => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/process/status/${sessionId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        let errorMessage = `Status check failed (${response.status})`;
+                        
+                        try {
+                            const errorData = JSON.parse(errorText);
+                            errorMessage = errorData.error?.message || errorData.message || errorMessage;
+                        } catch (e) {
+                            errorMessage = errorText || errorMessage;
+                        }
+                        
+                        throw new Error(errorMessage);
+                    }
+                    
+                    const status = await response.json();
+                    
+                    // Update progress based on status
+                    const progress = Math.min(60 + (attempts * 2), 95);
+                    updateProgress(progress, status.message || 'Processing file...');
+                    
+                    if (status.status === 'completed') {
+                        updateProgress(100, 'Processing complete!');
+                        downloadUrl = `${API_BASE_URL}/download/file/${sessionId}`;
+                        
+                        // Get original filename for display
+                        const originalFileName = document.getElementById('fileInput').files[0]?.name || 'processed_file';
+                        showResult(originalFileName, status);
+                        
+                    } else if (status.status === 'failed') {
+                        throw new Error(status.error || status.message || 'Processing failed. Please try again with a different file.');
+                        
+                    } else if (status.status === 'processing' || status.status === 'pending') {
+                        attempts++;
+                        if (attempts < maxAttempts) {
+                            // Continue polling
+                            processingInterval = setTimeout(poll, 1000);
+                        } else {
+                            throw new Error('Processing is taking longer than expected. Please try again or contact support.');
+                        }
+                    } else {
+                        // Unknown status, continue polling
+                        attempts++;
+                        if (attempts < maxAttempts) {
+                            processingInterval = setTimeout(poll, 1000);
+                        } else {
+                            throw new Error('Processing status unknown. Please try again.');
+                        }
+                    }
+                    
+                } catch (error) {
+                    console.error('Polling Error:', error);
+                    clearTimeout(processingInterval);
+                    throw error;
+                }
+            };
             
-            updateProgress(75, 'Optimizing file size...');
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            updateProgress(90, 'Finalizing processed file...');
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            updateProgress(100, 'Processing complete!');
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            // Create a simulated processed file
-            const processedFileName = file.name.replace(/\.(.*?)$/, '_reduced_by_dampdf_' + formatDate(new Date()) + '.$1');
-            
-            // Create download URL (in real implementation, this would come from your API)
-            downloadUrl = URL.createObjectURL(file); // This is just for demo - replace with actual processed file
-            
-            showResult(processedFileName);
+            // Start polling
+            await poll();
         }
 
         function getToolOptions() {
@@ -1660,17 +1805,29 @@
             }
         }
 
-        function showResult(originalFileName) {
+        function showResult(originalFileName, statusData = {}) {
             document.getElementById('progressBar').style.display = 'none';
             document.getElementById('progressText').style.display = 'none';
             document.getElementById('result').style.display = 'block';
             
             const toolAction = currentTool.includes('compress') ? 'reduced' : 'converted';
-            const sizeReduction = Math.floor(Math.random() * 30) + 40; // Simulate 40-70% reduction
+            
+            // Try to get actual file size reduction from status data
+            let sizeInfo = '';
+            if (statusData.original_size && statusData.processed_size) {
+                const reduction = Math.round((1 - statusData.processed_size / statusData.original_size) * 100);
+                sizeInfo = `File size reduced by ${reduction}%`;
+            } else if (statusData.size_reduction) {
+                sizeInfo = `File size reduced by ${statusData.size_reduction}%`;
+            } else if (toolAction === 'reduced') {
+                sizeInfo = 'File size optimized successfully';
+            } else {
+                sizeInfo = 'File converted successfully';
+            }
             
             document.getElementById('resultText').innerHTML = `
                 <strong>Success!</strong> Your file "${originalFileName}" has been ${toolAction} successfully!<br>
-                <small style="color: var(--text-secondary);">File size ${toolAction === 'reduced' ? `reduced by ${sizeReduction}%` : 'optimized'}. Files are automatically deleted after 1 hour for your privacy.</small>
+                <small style="color: var(--text-secondary);">${sizeInfo}. Files are automatically deleted after 1 hour for your privacy.</small>
             `;
             
             // Add success animation
@@ -1679,14 +1836,13 @@
 
         function downloadFile() {
             if (downloadUrl) {
+                // Create download link and trigger download
                 const link = document.createElement('a');
                 link.href = downloadUrl;
                 
-                // Set download filename based on current tool
-                const originalName = document.getElementById('fileInput').files[0]?.name || 'processed_file';
-                const toolSuffix = currentTool.includes('compress') ? '_reduced' : '_converted';
-                const newName = originalName.replace(/\.(.*?)$/, `${toolSuffix}_by_dampdf.$1`);
-                link.download = newName;
+                // Set proper download attributes
+                link.setAttribute('download', ''); // Let browser handle filename from server
+                link.setAttribute('target', '_blank'); // Open in new tab as fallback
                 
                 document.body.appendChild(link);
                 link.click();
@@ -1701,7 +1857,7 @@
                 setTimeout(() => {
                     downloadBtn.textContent = originalText;
                     downloadBtn.style.background = '#4caf50';
-                }, 2000);
+                }, 3000);
             } else {
                 showError('Download link not available. Please try processing the file again.');
             }
