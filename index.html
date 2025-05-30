@@ -1,4 +1,161 @@
-<!DOCTYPE html>
+// Add debug tools and endpoint discovery
+            requestIdleCallback(() => {
+                const statusIndicator = document.getElementById('backendStatus');
+                if (statusIndicator) {
+                    statusIndicator.style.cursor = 'pointer';
+                    statusIndicator.title = 'Click to manually check backend status or double-click for diagnostics';
+                    
+                    let clickTimeout;
+                    statusIndicator.addEventListener('click', () => {
+                        if (clickTimeout) {
+                            clearTimeout(clickTimeout);
+                            clickTimeout = null;
+                            // Double click - run full diagnostics
+                            runFullDiagnostics();
+                        } else {
+                            clickTimeout = setTimeout(() => {
+                                // Single click - simple health check
+                                BackendMonitor.checkHealth();
+                                clickTimeout = null;
+                            }, 300);
+                        }
+                    });
+                }
+
+                // Add endpoint discovery button to debug panel
+                const debugInfo = document.getElementById('debugInfo');
+                if (debugInfo) {
+                    const discoverButton = document.createElement('button');
+                    discoverButton.textContent = '🔍 Discover API Endpoints';
+                    discoverButton.className = 'error-action-btn primary';
+                    discoverButton.style.margin = '10px 0';
+                    discoverButton.onclick = async () => {
+                        discoverButton.textContent = '🔄 Discovering...';
+                        discoverButton.disabled = true;
+                        
+                        try {
+                            const endpoints = await APIClient.discoverEndpoints();
+                            document.getElementById('debugNetwork').textContent = JSON.stringify(endpoints, null, 2);
+                            discoverButton.textContent = '✅ Discovery Complete';
+                        } catch (error) {
+                            discoverButton.textContent = '❌ Discovery Failed';
+                            Logger.log('error', 'Endpoint discovery failed', error);
+                        } finally {
+                            setTimeout(() => {
+                                discoverButton.textContent = '🔍 Discover API Endpoints';
+                                discoverButton.disabled = false;
+                            }, 3000);
+                        }
+                    };
+                    
+                    debugInfo.insertBefore(discoverButton, debugInfo.firstChild);
+                }
+            });
+
+            Logger.log('info', 'DamPDF application initialized successfully');
+        });
+
+        // Full diagnostic function
+        async function runFullDiagnostics() {
+            Logger.log('info', 'Running full diagnostics...');
+            
+            const diagnostics = await BackendMonitor.runDiagnostics();
+            const endpoints = await APIClient.discoverEndpoints();
+            
+            // Show debug panel
+            document.getElementById('debugInfo').style.display = 'block';
+            Logger.updateDebugDisplay();
+            
+            // Update with diagnostic results
+            document.getElementById('debugNetwork').textContent = JSON.stringify({
+                diagnostics,
+                endpoints,
+                currentConfig: API_CONFIG
+            }, null, 2);
+            
+            // Show a summary in console
+            console.group('🔍 DamPDF Backend Diagnostics');
+            console.log('Backend URL:', API_CONFIG.BASE_URL);
+            console.log('Diagnostics:', diagnostics);
+            console.log('Endpoint Discovery:', endpoints);
+            console.log('Error Log:', errorLog);
+            console.groupEnd();
+        }
+
+        // Test upload function for debugging
+        async function testUpload() {
+            try {
+                // Create a test file
+                const testContent = 'This is a test file for API debugging';
+                const testFile = new File([testContent], 'test.txt', { type: 'text/plain' });
+                
+                Logger.log('info', 'Starting test upload', { fileName: testFile.name, size: testFile.size });
+                
+                // Try the upload process
+                await FileProcessor.upload(testFile, 'pdf-compress');
+                Logger.log('info', 'Test upload successful');
+                
+            } catch (error) {
+                Logger.log('error', 'Test upload failed', error);
+                ErrorManager.show(error, 'UPLOAD_TEST_ERROR');
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('toolModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Global error handler for unhandled errors
+        window.addEventListener('error', (event) => {
+            Logger.log('error', 'Unhandled error', {
+                message: event.message,
+                filename: event.filename,
+                lineno: event.lineno,
+                colno: event.colno,
+                error: event.error
+            });
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            Logger.log('error', 'Unhandled promise rejection', {
+                reason: event.reason,
+                promise: event.promise
+            });
+        });
+
+        // Network status monitoring
+        window.addEventListener('online', () => {
+            Logger.log('info', 'Network connection restored');
+            BackendMonitor.checkHealth();
+        });
+
+        window.addEventListener('offline', () => {
+            Logger.log('warn', 'Network connection lost');
+            const statusIndicator = document.getElementById('backendStatus');
+            statusIndicator.className = 'status-indicator offline';
+            statusIndicator.innerHTML = '<div class="status-dot"></div><span>Offline</span>';
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
