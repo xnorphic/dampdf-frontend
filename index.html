@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- Performance Optimization -->
+    <link rel="preconnect" href="https://dampdf-railway-production.up.railway.app">
+    <link rel="dns-prefetch" href="https://dampdf-railway-production.up.railway.app">
+    
     <!-- Primary SEO Meta Tags -->
     <title>Reduce Image Size & Convert Files to PDF Free | DamPDF - No Watermark PDF Compressor</title>
     <meta name="title" content="Reduce Image Size & Convert Files to PDF Free | DamPDF - No Watermark PDF Compressor">
@@ -49,7 +53,9 @@
     <link rel="canonical" href="https://dampf-frontend.vercel.app/">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
     
+    <!-- Critical CSS for LCP optimization -->
     <style>
+        /* Critical styles that must load first */
         :root {
             --primary-color: #1b76ff;
             --primary-hover: #1565c0;
@@ -71,11 +77,15 @@
             box-sizing: border-box;
         }
         
+        /* Critical above-the-fold styles */
+        
+        /* Critical CSS - Load First */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
             background: var(--bg-light);
             color: var(--text-primary);
             line-height: 1.6;
+            font-display: swap; /* Optimize font loading */
         }
         
         .container {
@@ -83,8 +93,60 @@
             margin: 0 auto;
             padding: 0 20px;
         }
+
+        /* Optimize Layout Shift - Fixed Heights */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 160px 1fr 160px;
+            gap: 20px;
+            padding: 20px 0;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 800px; /* Prevent layout shift */
+        }
         
-        /* Header */
+        .main-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: var(--shadow-light);
+            min-height: 600px; /* Reserve space to prevent shift */
+        }
+
+        /* Hero Section - Optimized for LCP */
+        .hero {
+            text-align: center;
+            padding: 60px 0;
+            contain: layout style; /* Optimize rendering */
+        }
+        
+        .hero h1 {
+            font-size: clamp(32px, 5vw, 56px);
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--text-primary), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            /* Remove animation for faster LCP */
+        }
+        
+        .hero .tagline {
+            font-size: clamp(18px, 3vw, 28px);
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            /* Remove animation for faster LCP */
+        }
+        
+        .hero .description {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto 40px;
+            /* Remove animation for faster LCP */
+        }
+        
+        /* Header - Critical Above Fold */
         header {
             background: white;
             padding: 20px 0;
@@ -92,6 +154,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            contain: layout style; /* Optimize rendering */
         }
         
         .header-content {
@@ -117,13 +180,8 @@
             color: white;
             font-weight: bold;
             font-size: 20px;
-            transition: var(--transition);
             cursor: pointer;
-        }
-        
-        .logo:hover {
-            transform: scale(1.05);
-            box-shadow: var(--shadow-hover);
+            /* Remove transition for faster render */
         }
         
         .logo-text {
@@ -145,27 +203,7 @@
             text-decoration: none;
             color: var(--text-secondary);
             font-weight: 500;
-            transition: var(--transition);
-            position: relative;
-        }
-        
-        nav a:hover {
-            color: var(--primary-color);
-        }
-        
-        nav a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -5px;
-            left: 0;
-            background-color: var(--primary-color);
-            transition: var(--transition);
-        }
-        
-        nav a:hover::after {
-            width: 100%;
+            /* Remove transition for faster render */
         }
 
         /* Backend Status Indicator */
@@ -199,19 +237,9 @@
             height: 8px;
             border-radius: 50%;
             background: currentColor;
-            animation: pulse 2s infinite;
         }
-        
-        /* Layout with Ads */
-        .main-layout {
-            display: grid;
-            grid-template-columns: 160px 1fr 160px;
-            gap: 20px;
-            padding: 20px 0;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
+
+        /* Layout optimization for LCP */
         .ad-sidebar {
             position: sticky;
             top: 100px;
@@ -232,58 +260,38 @@
             justify-content: center;
             flex-direction: column;
             gap: 10px;
-            transition: var(--transition);
         }
         
-        .ad-banner:hover {
-            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+        /* Stats Section - Lazy Load */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+            /* Remove animation for faster LCP */
         }
         
-        .ad-banner.bottom {
-            min-height: 120px;
-            margin: 40px 0;
-        }
-        
-        .main-content {
+        .stat {
+            text-align: center;
+            padding: 25px;
             background: white;
             border-radius: var(--border-radius);
-            padding: 40px;
             box-shadow: var(--shadow-light);
+            /* Remove transition for faster render */
         }
         
-        /* Hero Section with SEO Content */
-        .hero {
-            text-align: center;
-            padding: 60px 0;
-        }
-        
-        .hero h1 {
-            font-size: clamp(32px, 5vw, 56px);
+        .stat-number {
+            font-size: 32px;
             font-weight: bold;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, var(--text-primary), var(--primary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: fadeInUp 0.8s ease-out;
+            color: var(--primary-color);
+            display: block;
         }
         
-        .hero .tagline {
-            font-size: clamp(18px, 3vw, 28px);
+        .stat-label {
+            font-size: 16px;
             color: var(--text-secondary);
-            margin-bottom: 30px;
-            animation: fadeInUp 0.8s ease-out 0.2s both;
+            margin-top: 8px;
         }
-        
-        .hero .description {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 800px;
-            margin: 0 auto 40px;
-            animation: fadeInUp 0.8s ease-out 0.4s both;
-        }
-        
-        /* Stats Section */
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -1581,7 +1589,9 @@
 
                     const response = await fetch(url, {
                         ...options,
-                        signal: controller.signal
+                        signal: controller.signal,
+                        mode: 'cors', // Explicitly set CORS mode
+                        credentials: 'omit' // Don't send credentials for CORS
                     });
 
                     clearTimeout(timeoutId);
@@ -1621,3 +1631,4 @@
                     return response;
 
                 }
+                
