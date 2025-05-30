@@ -1343,11 +1343,11 @@
             <h2 id="modalTitle">Tool</h2>
             
             <div id="uploadSection">
-                <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-zone" id="uploadZone">
                     <div style="font-size: 48px; margin-bottom: 20px;">📁</div>
                     <p style="font-size: 18px; margin-bottom: 10px;"><strong>Drop your file here</strong></p>
                     <p style="color: var(--text-secondary); margin-bottom: 20px;">or click to browse from your computer</p>
-                    <button class="upload-button clickable" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">
+                    <button class="upload-button clickable" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById('fileInput').click()">
                         Choose File
                     </button>
                 </div>
@@ -1473,17 +1473,31 @@
             const uploadZone = document.getElementById('uploadZone');
             
             if (uploadZone) {
+                // Add click handler for upload zone (but not the button)
+                uploadZone.addEventListener('click', function(e) {
+                    // Only trigger file dialog if clicking on the zone itself, not the button
+                    if (e.target === uploadZone || e.target.closest('.upload-zone') === uploadZone) {
+                        if (!e.target.closest('.upload-button')) {
+                            document.getElementById('fileInput').click();
+                        }
+                    }
+                });
+                
                 uploadZone.addEventListener('dragover', (e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     uploadZone.classList.add('dragover');
                 });
                 
-                uploadZone.addEventListener('dragleave', () => {
+                uploadZone.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     uploadZone.classList.remove('dragover');
                 });
                 
                 uploadZone.addEventListener('drop', (e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     uploadZone.classList.remove('dragover');
                     const files = e.dataTransfer.files;
                     if (files.length > 0) {
@@ -1494,6 +1508,8 @@
         });
 
         function handleFileSelect(event) {
+            event.preventDefault();
+            event.stopPropagation();
             const file = event.target.files[0];
             if (file) {
                 processFile(file);
