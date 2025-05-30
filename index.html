@@ -1490,7 +1490,7 @@
         const API_CONFIG = {
             BASE_URL: 'https://dampdf-railway-production.up.railway.app',
             ENDPOINTS: {
-                HEALTH: '/health',
+                HEALTH: '/', // Use root endpoint since we know it works
                 UPLOAD: '/api/v1/files/upload',
                 PROCESS: '/api/v1/process/start',
                 STATUS: '/api/v1/process/status',
