@@ -5,23 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Primary SEO Meta Tags -->
-    <title>DamPDF - Free Online PDF Size Reducer & File Converter | Reduce PDF Size Without Losing Quality</title>
-    <meta name="title" content="DamPDF - Free Online PDF Size Reducer & File Converter | Reduce PDF Size Without Losing Quality">
-    <meta name="description" content="Free online PDF size reducer and file converter. Reduce PDF file size, convert DOCX to PDF, Excel to PDF, and reduce image size. Shrink file size without watermark. Best alternative to iLovePDF.">
-    <meta name="keywords" content="reduce PDF size, PDF size reducer, reduce PDF file size online, PDF converter, DOCX to PDF, Excel to PDF, reduce image size, image size reducer, PDF size reduction tool, convert to PDF, merge PDF, split PDF, PDF editor online, reduce PDF size without losing quality, free PDF tools, PDF optimizer, shrink PDF file size, reduce PDF size online free, convert Word to PDF, PowerPoint to PDF, image to PDF converter, reduce PDF size for email, reduce file size online">
+    <title>DamPDF - Free Online PDF Compressor & File Converter | Compress PDF Without Losing Quality</title>
+    <meta name="title" content="DamPDF - Free Online PDF Compressor & File Converter | Compress PDF Without Losing Quality">
+    <meta name="description" content="Free online PDF compressor and file converter. Compress PDF files, convert DOCX to PDF, Excel to PDF, and compress images. Reduce file size without watermark. Best alternative to iLovePDF.">
+    <meta name="keywords" content="PDF compressor, compress PDF online, PDF converter, DOCX to PDF, Excel to PDF, image compressor, reduce PDF size, PDF compression tool, convert to PDF, merge PDF, split PDF, PDF editor online, compress PDF without losing quality, free PDF tools, PDF optimizer, shrink PDF file size, PDF compressor online free, convert Word to PDF, PowerPoint to PDF, image to PDF converter, compress PDF for email, reduce file size online">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://dampf-frontend.vercel.app/">
-    <meta property="og:title" content="DamPDF - Free Online PDF Size Reducer & File Converter">
-    <meta property="og:description" content="Reduce PDF file size and convert documents online for free. Shrink file size without losing quality. Best PDF size reduction tool alternative to iLovePDF.">
+    <meta property="og:title" content="DamPDF - Free Online PDF Compressor & File Converter">
+    <meta property="og:description" content="Compress PDF files and convert documents online for free. Reduce file size without losing quality. Best PDF compression tool alternative to iLovePDF.">
     <meta property="og:image" content="https://dampf-frontend.vercel.app/og-image.jpg">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://dampf-frontend.vercel.app/">
-    <meta property="twitter:title" content="DamPDF - Free Online PDF Size Reducer & File Converter">
-    <meta property="twitter:description" content="Reduce PDF file size and convert documents online for free. Shrink file size without losing quality.">
+    <meta property="twitter:title" content="DamPDF - Free Online PDF Compressor & File Converter">
+    <meta property="twitter:description" content="Compress PDF files and convert documents online for free. Reduce file size without losing quality.">
     <meta property="twitter:image" content="https://dampf-frontend.vercel.app/og-image.jpg">
     
     <!-- Structured Data -->
@@ -32,7 +32,7 @@
         "name": "DamPDF",
         "applicationCategory": "Productivity",
         "operatingSystem": "Web Browser",
-        "description": "Free online PDF size reducer and file converter tool. Reduce PDF file size, convert DOCX to PDF, Excel to PDF without losing quality.",
+        "description": "Free online PDF compressor and file converter tool. Compress PDF files, convert DOCX to PDF, Excel to PDF without losing quality.",
         "url": "https://dampf-frontend.vercel.app/",
         "author": {
             "@type": "Organization",
@@ -56,6 +56,9 @@
             --text-primary: #323334;
             --text-secondary: #8c949d;
             --bg-light: #f0f6fb;
+            --error-color: #f44336;
+            --warning-color: #ff9800;
+            --success-color: #4caf50;
             --shadow-light: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-hover: 0 8px 15px rgba(0,0,0,0.15);
             --border-radius: 12px;
@@ -73,7 +76,6 @@
             background: var(--bg-light);
             color: var(--text-primary);
             line-height: 1.6;
-            overflow-x: hidden;
         }
         
         .container {
@@ -165,20 +167,54 @@
         nav a:hover::after {
             width: 100%;
         }
+
+        /* Backend Status Indicator */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-indicator.online {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-indicator.offline {
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--error-color);
+        }
+
+        .status-indicator.checking {
+            background: rgba(255, 152, 0, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
         
-        /* Layout with Ads - Fixed for better responsiveness */
+        /* Layout with Ads */
         .main-layout {
             display: grid;
             grid-template-columns: 160px 1fr 160px;
             gap: 20px;
-            padding: 20px;
+            padding: 20px 0;
             max-width: 1400px;
             margin: 0 auto;
         }
         
         .ad-sidebar {
             position: sticky;
-            top: 120px;
+            top: 100px;
             height: fit-content;
         }
         
@@ -213,60 +249,52 @@
             border-radius: var(--border-radius);
             padding: 40px;
             box-shadow: var(--shadow-light);
-            min-height: calc(100vh - 140px);
-            width: 100%;
-            max-width: 100%;
         }
         
-        /* Hero Section - Fixed text display issues */
+        /* Hero Section with SEO Content */
         .hero {
             text-align: center;
             padding: 60px 0;
-            width: 100%;
-            max-width: 100%;
         }
         
         .hero h1 {
-            font-size: clamp(28px, 4vw, 48px);
+            font-size: clamp(32px, 5vw, 56px);
             font-weight: bold;
             margin-bottom: 20px;
-            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--text-primary), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             animation: fadeInUp 0.8s ease-out;
-            line-height: 1.2;
-            word-wrap: break-word;
-            hyphens: auto;
         }
         
         .hero .tagline {
-            font-size: clamp(16px, 2.5vw, 24px);
+            font-size: clamp(18px, 3vw, 28px);
             color: var(--text-secondary);
             margin-bottom: 30px;
             animation: fadeInUp 0.8s ease-out 0.2s both;
-            line-height: 1.4;
         }
         
         .hero .description {
-            font-size: clamp(16px, 1.5vw, 18px);
+            font-size: 18px;
             color: var(--text-secondary);
             max-width: 800px;
             margin: 0 auto 40px;
             animation: fadeInUp 0.8s ease-out 0.4s both;
-            line-height: 1.6;
-            padding: 0 20px;
         }
         
-        /* Stats Section - Improved responsive grid */
+        /* Stats Section */
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
             margin: 50px 0;
             animation: fadeInUp 0.8s ease-out 0.6s both;
         }
         
         .stat {
             text-align: center;
-            padding: 25px 15px;
+            padding: 25px;
             background: white;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow-light);
@@ -279,56 +307,51 @@
         }
         
         .stat-number {
-            font-size: clamp(24px, 3vw, 32px);
+            font-size: 32px;
             font-weight: bold;
             color: var(--primary-color);
             display: block;
         }
         
         .stat-label {
-            font-size: clamp(14px, 1.2vw, 16px);
+            font-size: 16px;
             color: var(--text-secondary);
             margin-top: 8px;
-            line-height: 1.3;
         }
         
-        /* Tools Grid - Improved responsive behavior */
+        /* Tools Grid */
         .tools-section {
             padding: 60px 0;
-            width: 100%;
         }
         
         .section-title {
-            font-size: clamp(28px, 4vw, 36px);
+            font-size: 36px;
             font-weight: bold;
             text-align: center;
             margin-bottom: 20px;
             color: var(--text-primary);
-            line-height: 1.2;
         }
         
         .section-subtitle {
             text-align: center;
             color: var(--text-secondary);
-            font-size: clamp(16px, 1.5vw, 18px);
+            font-size: 18px;
             margin-bottom: 50px;
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
-            padding: 0 20px;
-            line-height: 1.5;
         }
         
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
             margin-top: 40px;
         }
         
         .tool-card {
             background: white;
-            padding: 35px 25px;
+            padding: 35px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow-light);
             text-align: center;
@@ -377,7 +400,7 @@
         }
         
         .tool-name {
-            font-size: clamp(18px, 2vw, 22px);
+            font-size: 22px;
             font-weight: bold;
             margin-bottom: 15px;
             color: var(--text-primary);
@@ -387,7 +410,6 @@
             color: var(--text-secondary);
             line-height: 1.6;
             margin-bottom: 25px;
-            font-size: clamp(14px, 1.2vw, 16px);
         }
         
         .tool-features {
@@ -399,7 +421,6 @@
             color: var(--text-secondary);
             font-size: 14px;
             margin-bottom: 5px;
-            text-align: left;
         }
         
         .tool-features li::before {
@@ -421,8 +442,6 @@
             transition: var(--transition);
             position: relative;
             overflow: hidden;
-            width: 100%;
-            max-width: 280px;
         }
         
         .try-now:hover {
@@ -452,21 +471,21 @@
         /* Features Section */
         .features-section {
             background: white;
-            padding: 80px 40px;
+            padding: 80px 0;
             margin: 60px 0;
             border-radius: var(--border-radius);
         }
         
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 40px;
             margin-top: 50px;
         }
         
         .feature {
             text-align: center;
-            padding: 30px 20px;
+            padding: 30px;
             transition: var(--transition);
         }
         
@@ -494,7 +513,7 @@
         }
         
         .feature-title {
-            font-size: clamp(20px, 2.5vw, 24px);
+            font-size: 24px;
             font-weight: bold;
             color: var(--text-primary);
             margin-bottom: 15px;
@@ -503,13 +522,12 @@
         .feature-description {
             color: var(--text-secondary);
             line-height: 1.6;
-            font-size: clamp(14px, 1.2vw, 16px);
         }
         
         /* SEO Content Sections */
         .seo-section {
             background: white;
-            padding: 60px 40px;
+            padding: 60px 0;
             margin: 40px 0;
             border-radius: var(--border-radius);
         }
@@ -520,36 +538,33 @@
         }
         
         .seo-content h2 {
-            font-size: clamp(24px, 3vw, 32px);
+            font-size: 32px;
             margin-bottom: 20px;
             color: var(--text-primary);
-            line-height: 1.3;
         }
         
         .seo-content h3 {
-            font-size: clamp(20px, 2.5vw, 24px);
+            font-size: 24px;
             margin: 30px 0 15px;
             color: var(--text-primary);
-            line-height: 1.3;
         }
         
         .seo-content p {
             margin-bottom: 20px;
             line-height: 1.8;
             color: var(--text-secondary);
-            font-size: clamp(14px, 1.2vw, 16px);
         }
         
         /* Footer Links */
         .footer-links {
             background: white;
-            padding: 50px 40px;
+            padding: 50px 0;
             margin-top: 60px;
         }
         
         .footer-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 40px;
         }
         
@@ -572,7 +587,6 @@
             color: var(--text-secondary);
             text-decoration: none;
             transition: var(--transition);
-            font-size: 14px;
         }
         
         .footer-column ul li a:hover {
@@ -584,7 +598,7 @@
             background: var(--text-primary);
             color: white;
             text-align: center;
-            padding: 40px 20px;
+            padding: 40px 0;
         }
         
         /* Modal Styles */
@@ -610,8 +624,6 @@
             position: relative;
             animation: modalSlideIn 0.3s ease-out;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            max-height: 80vh;
-            overflow-y: auto;
         }
         
         .close {
@@ -634,7 +646,7 @@
         .upload-zone {
             border: 3px dashed #ddd;
             border-radius: var(--border-radius);
-            padding: 50px 20px;
+            padding: 50px;
             text-align: center;
             margin: 30px 0;
             transition: var(--transition);
@@ -707,6 +719,122 @@
             background-size: 50px 50px;
             animation: move 2s linear infinite;
         }
+
+        /* Enhanced Error Display */
+        .error-container {
+            background: #fff3f3;
+            border: 1px solid #ffcccb;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .error-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .error-icon {
+            font-size: 24px;
+            color: var(--error-color);
+        }
+
+        .error-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--error-color);
+        }
+
+        .error-type {
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--error-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .error-message {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .error-details {
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .error-action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .error-action-btn.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .error-action-btn.secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .error-action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Debug Info Styles */
+        .debug-info {
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            display: none;
+        }
+
+        .debug-section {
+            margin-bottom: 15px;
+        }
+
+        .debug-section h4 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-family: inherit;
+        }
+
+        .debug-section pre {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
         
         /* Animations */
         @keyframes fadeInUp {
@@ -743,100 +871,39 @@
         @keyframes pulse {
             0%, 100% {
                 transform: scale(1);
+                opacity: 1;
             }
             50% {
                 transform: scale(1.05);
+                opacity: 0.8;
             }
         }
         
-        /* Responsive Design - Improved breakpoints */
-        @media (max-width: 1200px) {
-            .main-layout {
-                grid-template-columns: 120px 1fr 120px;
-                gap: 15px;
-            }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
+        /* Responsive Design */
         @media (max-width: 1024px) {
             .main-layout {
                 grid-template-columns: 1fr;
-                padding: 15px;
             }
             
             .ad-sidebar {
                 display: none;
             }
-            
-            .main-content {
-                padding: 30px 20px;
-            }
-            
-            .hero {
-                padding: 40px 0;
-            }
         }
         
         @media (max-width: 768px) {
-            .hero {
-                padding: 30px 0;
-            }
-            
-            .tools-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .modal-content {
-                margin: 10% auto;
-                width: 95%;
-                padding: 30px 20px;
-            }
-            
-            .main-content {
-                padding: 20px 15px;
-            }
+            .hero h1 { font-size: 32px; }
+            .tagline { font-size: 18px; }
+            .tools-grid { grid-template-columns: 1fr; }
+            .modal-content { margin: 10% auto; width: 95%; padding: 30px; }
+            .main-content { padding: 30px 20px; }
             
             nav {
                 display: none;
-            }
-            
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-            }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
-                gap: 30px;
-            }
-            
-            .footer-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 30px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .header-content {
-                padding: 0 10px;
-            }
-            
-            .logo-text {
-                font-size: 24px;
-            }
-            
-            .stats {
-                grid-template-columns: 1fr;
-            }
-            
-            .tool-card {
-                padding: 25px 20px;
-            }
-            
-            .features-section,
-            .seo-section,
-            .footer-links {
-                padding: 40px 20px;
             }
         }
         
@@ -856,29 +923,7 @@
             margin: 20px auto;
         }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Compression Level Options */
-        .compression-option {
-            transition: all 0.3s ease;
-        }
-        
-        .compression-option:hover {
-            border-color: var(--primary-color) !important;
-            background: rgba(27, 118, 255, 0.05);
-        }
-        
-        .compression-option input[type="radio"]:checked + div {
-            color: var(--primary-color);
-        }
-        
-        .compression-option:has(input[type="radio"]:checked) {
-            border-color: var(--primary-color) !important;
-            background: rgba(27, 118, 255, 0.1);
-        }
+        /* Micro-interactions */
         .clickable {
             cursor: pointer;
             transition: var(--transition);
@@ -925,6 +970,10 @@
                     <a href="#faq">FAQ</a>
                     <a href="#articles">Articles</a>
                     <a href="#privacy">Privacy</a>
+                    <div id="backendStatus" class="status-indicator checking">
+                        <div class="status-dot"></div>
+                        <span>Checking Backend...</span>
+                    </div>
                 </nav>
             </div>
         </div>
@@ -944,11 +993,11 @@
         <!-- Main Content -->
         <div class="main-content">
             <section class="hero">
-                <h1>Free Online PDF Size Reducer & File Converter</h1>
-                <p class="tagline">Reduce PDF file size and convert documents without losing quality</p>
+                <h1>Free Online PDF Compressor & File Converter</h1>
+                <p class="tagline">Compress PDF files and convert documents without losing quality</p>
                 <p class="description">
-                    The best free alternative to iLovePDF. Reduce PDF size online, convert DOCX to PDF, Excel to PDF, and reduce image size. 
-                    Shrink file size for email attachments without watermark. Trusted by millions worldwide.
+                    The best free alternative to iLovePDF. Compress PDF online, convert DOCX to PDF, Excel to PDF, and optimize images. 
+                    Reduce file size for email attachments without watermark. Trusted by millions worldwide.
                 </p>
                 
                 <div class="stats">
@@ -972,50 +1021,50 @@
             </section>
 
             <section id="tools" class="tools-section">
-                <h2 class="section-title">Professional PDF Size Reduction & File Converters</h2>
+                <h2 class="section-title">Professional PDF Tools & File Converters</h2>
                 <p class="section-subtitle">
-                    Comprehensive suite of PDF size reduction and document conversion tools. 
+                    Comprehensive suite of PDF compression and document conversion tools. 
                     Process files securely with enterprise-grade encryption.
                 </p>
                 
                 <div class="tools-grid">
-                    <div class="tool-card clickable" onclick="openTool('image-compress', 'Image Size Reducer', 'image/jpeg,image/png,image/webp')">
+                    <div class="tool-card clickable">
                         <div class="tool-icon">🖼️</div>
-                        <h3 class="tool-name">Image Size Reducer</h3>
+                        <h3 class="tool-name">Image Compressor</h3>
                         <p class="tool-description">
-                            Reduce JPG, PNG, and WEBP image size online. Shrink image file size for web, email, and storage. 
-                            Advanced algorithms maintain image quality while achieving optimal size reduction.
+                            Compress JPG, PNG, and WEBP images online. Reduce image file size for web, email, and storage. 
+                            Advanced algorithms maintain image quality while achieving optimal compression ratios.
                         </p>
                         <ul class="tool-features">
                             <li>Support for JPG, PNG, WEBP formats</li>
-                            <li>Batch size reduction available</li>
-                            <li>Lossless and lossy reduction</li>
+                            <li>Batch compression available</li>
+                            <li>Lossless and lossy compression</li>
                             <li>Web optimization presets</li>
                         </ul>
-                        <button class="try-now clickable" onclick="event.stopPropagation(); openTool('image-compress', 'Image Size Reducer', 'image/jpeg,image/png,image/webp')">
-                            Reduce Image Size Now
+                        <button class="try-now clickable" onclick="openTool('image-compress', 'Image Compressor', 'image/jpeg,image/png,image/webp')">
+                            Compress Images Now
                         </button>
                     </div>
                     
-                    <div class="tool-card clickable" onclick="openTool('pdf-compress', 'PDF Size Reducer', 'application/pdf')">
+                    <div class="tool-card clickable">
                         <div class="tool-icon">📄</div>
-                        <h3 class="tool-name">PDF Size Reducer</h3>
+                        <h3 class="tool-name">PDF Compressor</h3>
                         <p class="tool-description">
-                            Best free PDF size reducer online. Reduce PDF file size without losing quality. 
+                            Best free PDF compressor online. Reduce PDF file size without losing quality. 
                             Perfect for email attachments, web uploads, and storage optimization.
                         </p>
                         <ul class="tool-features">
-                            <li>Reduce PDF size without quality loss</li>
-                            <li>Shrink file size up to 90%</li>
-                            <li>Batch PDF size reduction</li>
+                            <li>Compress PDF without quality loss</li>
+                            <li>Reduce file size up to 90%</li>
+                            <li>Batch PDF compression</li>
                             <li>No file size limits</li>
                         </ul>
-                        <button class="try-now clickable" onclick="event.stopPropagation(); openTool('pdf-compress', 'PDF Size Reducer', 'application/pdf')">
-                            Reduce PDF Size Free
+                        <button class="try-now clickable" onclick="openTool('pdf-compress', 'PDF Compressor', 'application/pdf')">
+                            Compress PDF Free
                         </button>
                     </div>
                     
-                    <div class="tool-card clickable" onclick="openTool('docx-to-pdf', 'DOCX to PDF Converter', '.doc,.docx')">
+                    <div class="tool-card clickable">
                         <div class="tool-icon">📝</div>
                         <h3 class="tool-name">DOCX to PDF Converter</h3>
                         <p class="tool-description">
@@ -1028,12 +1077,12 @@
                             <li>Maintain fonts and images</li>
                             <li>Password protection available</li>
                         </ul>
-                        <button class="try-now clickable" onclick="event.stopPropagation(); openTool('docx-to-pdf', 'DOCX to PDF Converter', '.doc,.docx')">
+                        <button class="try-now clickable" onclick="openTool('docx-to-pdf', 'DOCX to PDF Converter', '.doc,.docx')">
                             Convert to PDF Now
                         </button>
                     </div>
                     
-                    <div class="tool-card clickable" onclick="openTool('xlsx-to-pdf', 'Excel to PDF Converter', '.xls,.xlsx')">
+                    <div class="tool-card clickable">
                         <div class="tool-icon">📊</div>
                         <h3 class="tool-name">Excel to PDF Converter</h3>
                         <p class="tool-description">
@@ -1046,7 +1095,7 @@
                             <li>Multiple sheet conversion</li>
                             <li>Custom page orientation</li>
                         </ul>
-                        <button class="try-now clickable" onclick="event.stopPropagation(); openTool('xlsx-to-pdf', 'Excel to PDF Converter', '.xls,.xlsx')">
+                        <button class="try-now clickable" onclick="openTool('xlsx-to-pdf', 'Excel to PDF Converter', '.xls,.xlsx')">
                             Convert Excel to PDF
                         </button>
                     </div>
@@ -1058,7 +1107,7 @@
                 <div class="container">
                     <h2 class="section-title">Why Choose DamPDF Over iLovePDF?</h2>
                     <p class="section-subtitle">
-                        Advanced PDF processing with superior size reduction algorithms, better security, and faster processing speeds.
+                        Advanced PDF processing with superior compression algorithms, better security, and faster processing speeds.
                     </p>
                     
                     <div class="features-grid">
@@ -1066,7 +1115,7 @@
                             <div class="feature-icon">⚡</div>
                             <h3 class="feature-title">Lightning Fast Processing</h3>
                             <p class="feature-description">
-                                Process files 3x faster than competitors with our optimized size reduction algorithms. 
+                                Process files 3x faster than competitors with our optimized compression algorithms. 
                                 Advanced multi-threading ensures quick turnaround times even for large files.
                             </p>
                         </div>
@@ -1082,10 +1131,10 @@
                         
                         <div class="feature">
                             <div class="feature-icon">🎯</div>
-                            <h3 class="feature-title">Superior Size Reduction Quality</h3>
+                            <h3 class="feature-title">Superior Compression Quality</h3>
                             <p class="feature-description">
-                                Our advanced AI-powered algorithms maintain 99% quality while reducing file sizes up to 90%. 
-                                Perfect balance between size reduction and visual fidelity.
+                                Our advanced AI-powered compression maintains 99% quality while reducing file sizes up to 90%. 
+                                Perfect balance between compression ratio and visual fidelity.
                             </p>
                         </div>
                         
@@ -1123,27 +1172,27 @@
             <section class="seo-section">
                 <div class="container">
                     <div class="seo-content">
-                        <h2>Complete Guide to PDF Size Reduction and File Conversion</h2>
+                        <h2>Complete Guide to PDF Compression and File Conversion</h2>
                         
-                        <h3>What is PDF Size Reduction?</h3>
+                        <h3>What is PDF Compression?</h3>
                         <p>
-                            PDF size reduction is the process of shrinking PDF file size while maintaining document quality and readability. 
-                            Our advanced algorithms analyze PDF structure, optimize images, remove redundant data, 
-                            and apply lossless techniques to achieve maximum size reduction without quality loss.
+                            PDF compression is the process of reducing PDF file size while maintaining document quality and readability. 
+                            Our advanced compression algorithms analyze PDF structure, optimize images, remove redundant data, 
+                            and apply lossless compression techniques to achieve maximum size reduction without quality loss.
                         </p>
                         
-                        <h3>Benefits of Using Online PDF Size Reducer</h3>
+                        <h3>Benefits of Using Online PDF Compressor</h3>
                         <p>
-                            Online PDF size reduction offers numerous advantages over desktop software: no installation required, 
+                            Online PDF compression offers numerous advantages over desktop software: no installation required, 
                             cross-platform compatibility, automatic updates, and secure cloud processing. DamPDF's web-based 
-                            reducer provides enterprise-grade security with military-level encryption for sensitive documents.
+                            compressor provides enterprise-grade security with military-level encryption for sensitive documents.
                         </p>
                         
-                        <h3>How to Reduce PDF File Size Online</h3>
+                        <h3>How to Compress PDF Files Online</h3>
                         <p>
-                            Reducing PDF file size with DamPDF is simple: upload your PDF, select reduction level, 
-                            and download the optimized file. Our intelligent algorithms detect document type 
-                            (text-heavy, image-rich, or mixed content) and apply appropriate optimization techniques.
+                            Compressing PDF files with DamPDF is simple: upload your PDF, select compression level, 
+                            and download the optimized file. Our intelligent compression detects document type 
+                            (text-heavy, image-rich, or mixed content) and applies appropriate optimization techniques.
                         </p>
                         
                         <h3>Document Conversion Made Easy</h3>
@@ -1171,7 +1220,7 @@
                         <div class="footer-column">
                             <h4>PDF Tools</h4>
                             <ul>
-                                <li><a href="#" onclick="openTool('pdf-compress', 'PDF Size Reducer', 'application/pdf')">Reduce PDF Size Online</a></li>
+                                <li><a href="#" onclick="openTool('pdf-compress', 'PDF Compressor', 'application/pdf')">Compress PDF Online</a></li>
                                 <li><a href="#" onclick="openTool('pdf-merge', 'PDF Merger', 'application/pdf')">Merge PDF Files</a></li>
                                 <li><a href="#" onclick="openTool('pdf-split', 'PDF Splitter', 'application/pdf')">Split PDF Pages</a></li>
                                 <li><a href="#" onclick="openTool('pdf-rotate', 'PDF Rotator', 'application/pdf')">Rotate PDF Pages</a></li>
@@ -1193,7 +1242,7 @@
                         <div class="footer-column">
                             <h4>Image Tools</h4>
                             <ul>
-                                <li><a href="#" onclick="openTool('image-compress', 'Image Size Reducer', 'image/*')">Reduce Image Size</a></li>
+                                <li><a href="#" onclick="openTool('image-compress', 'Image Compressor', 'image/*')">Compress Images</a></li>
                                 <li><a href="#" onclick="openTool('image-resize', 'Image Resizer', 'image/*')">Resize Images</a></li>
                                 <li><a href="#" onclick="openTool('image-crop', 'Image Cropper', 'image/*')">Crop Images</a></li>
                                 <li><a href="#" onclick="openTool('image-convert', 'Image Converter', 'image/*')">Convert Image Format</a></li>
@@ -1222,10 +1271,10 @@
                     <div class="seo-content">
                         <h2>Frequently Asked Questions (FAQ)</h2>
                         
-                        <h3>How do I reduce PDF file size without losing quality?</h3>
+                        <h3>How do I compress a PDF file without losing quality?</h3>
                         <p>
-                            DamPDF uses advanced size reduction algorithms that analyze your PDF content and apply optimal techniques. 
-                            For text-heavy documents, we optimize fonts and remove redundancies. For image-rich PDFs, 
+                            DamPDF uses advanced compression algorithms that analyze your PDF content and apply optimal compression 
+                            techniques. For text-heavy documents, we compress fonts and remove redundancies. For image-rich PDFs, 
                             we use intelligent image optimization that maintains visual quality while significantly reducing file size.
                         </p>
                         
@@ -1244,7 +1293,7 @@
                         
                         <h3>How does DamPDF compare to iLovePDF?</h3>
                         <p>
-                            DamPDF offers superior size reduction ratios, faster processing speeds, and better security. 
+                            DamPDF offers superior compression ratios, faster processing speeds, and better security. 
                             Unlike iLovePDF, we don't add watermarks to your documents, have no file size restrictions, 
                             and provide unlimited usage without requiring account registration.
                         </p>
@@ -1263,19 +1312,19 @@
             <section id="articles" class="seo-section" style="display: none;">
                 <div class="container">
                     <div class="seo-content">
-                        <h2>PDF Size Reduction Articles & Tutorials</h2>
+                        <h2>PDF Compression Articles & Tutorials</h2>
                         
                         <h3>The Complete Guide to PDF Optimization</h3>
                         <p>
                             Learn advanced techniques for PDF optimization, including best practices for different document types, 
-                            size reduction settings explanation, and tips for maintaining quality while achieving maximum reduction. 
+                            compression settings explanation, and tips for maintaining quality while achieving maximum size reduction. 
                             Covers both automated and manual optimization strategies.
                         </p>
                         
                         <h3>How to Reduce PDF File Size for Email Attachments</h3>
                         <p>
-                            Email providers typically limit attachment sizes to 25MB. Learn how to reduce large PDF files 
-                            for email sharing without compromising readability. Includes comparison of reduction levels 
+                            Email providers typically limit attachment sizes to 25MB. Learn how to compress large PDF files 
+                            for email sharing without compromising readability. Includes comparison of compression levels 
                             and their impact on file quality and size.
                         </p>
                         
@@ -1286,10 +1335,10 @@
                             across different file formats and platforms.
                         </p>
                         
-                        <h3>Understanding PDF Size Reduction Algorithms</h3>
+                        <h3>Understanding PDF Compression Algorithms</h3>
                         <p>
-                            Technical deep-dive into PDF optimization methods including lossless vs lossy reduction, 
-                            image optimization techniques, font subsetting, and content stream optimization. 
+                            Technical deep-dive into PDF compression methods including lossless vs lossy compression, 
+                            image optimization techniques, font subsetting, and content stream compression. 
                             Perfect for developers and technical users.
                         </p>
                     </div>
@@ -1360,39 +1409,11 @@
             <h2 id="modalTitle">Tool</h2>
             
             <div id="uploadSection">
-                <!-- Compression Level Selection -->
-                <div id="compressionLevelSection" style="margin-bottom: 20px; display: none;">
-                    <h4 style="margin-bottom: 15px; color: var(--text-primary);">Choose Compression Level:</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                        <label class="compression-option" style="display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
-                            <input type="radio" name="compression" value="light" style="margin-right: 10px;">
-                            <div>
-                                <strong>Light Compression</strong><br>
-                                <small style="color: var(--text-secondary);">High quality, 20-40% reduction</small>
-                            </div>
-                        </label>
-                        <label class="compression-option" style="display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
-                            <input type="radio" name="compression" value="medium" checked style="margin-right: 10px;">
-                            <div>
-                                <strong>Medium Compression</strong><br>
-                                <small style="color: var(--text-secondary);">Balanced quality, 40-70% reduction</small>
-                            </div>
-                        </label>
-                        <label class="compression-option" style="display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
-                            <input type="radio" name="compression" value="high" style="margin-right: 10px;">
-                            <div>
-                                <strong>High Compression</strong><br>
-                                <small style="color: var(--text-secondary);">Maximum reduction, target &lt;100KB</small>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
                 <div class="upload-zone" id="uploadZone">
                     <div style="font-size: 48px; margin-bottom: 20px;">📁</div>
                     <p style="font-size: 18px; margin-bottom: 10px;"><strong>Drop your file here</strong></p>
                     <p style="color: var(--text-secondary); margin-bottom: 20px;">or click to browse from your computer</p>
-                    <button class="upload-button clickable" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById('fileInput').click()">
+                    <button class="upload-button clickable" onclick="document.getElementById('fileInput').click()">
                         Choose File
                     </button>
                 </div>
@@ -1402,7 +1423,47 @@
                 </p>
             </div>
             
-            <div id="errorMessage" style="display: none; color: #f44336; background: #ffebee; padding: 15px; border-radius: 8px; margin: 20px 0;"></div>
+            <!-- Enhanced Error Display -->
+            <div id="errorContainer" class="error-container">
+                <div class="error-header">
+                    <div class="error-icon">⚠️</div>
+                    <div class="error-title">Processing Error</div>
+                    <div id="errorType" class="error-type">UNKNOWN</div>
+                </div>
+                <div id="errorMessage" class="error-message"></div>
+                <div id="errorDetails" class="error-details" style="display: none;"></div>
+                <div class="error-actions">
+                    <button class="error-action-btn primary" onclick="downloadErrorLog()">
+                        📄 Download Error Log
+                    </button>
+                    <button class="error-action-btn secondary" onclick="toggleErrorDetails()">
+                        🔍 Show Details
+                    </button>
+                    <button class="error-action-btn secondary" onclick="resetTool()">
+                        🔄 Try Again
+                    </button>
+                </div>
+            </div>
+
+            <!-- Debug Information -->
+            <div id="debugInfo" class="debug-info">
+                <div class="debug-section">
+                    <h4>System Information</h4>
+                    <pre id="debugSystem"></pre>
+                </div>
+                <div class="debug-section">
+                    <h4>Request Details</h4>
+                    <pre id="debugRequest"></pre>
+                </div>
+                <div class="debug-section">
+                    <h4>Backend Response</h4>
+                    <pre id="debugResponse"></pre>
+                </div>
+                <div class="debug-section">
+                    <h4>Network Trace</h4>
+                    <pre id="debugNetwork"></pre>
+                </div>
+            </div>
             
             <div class="progress-bar" id="progressBar">
                 <div class="progress-fill" id="progressFill"></div>
@@ -1424,671 +1485,138 @@
     </div>
 
     <script>
-        // Configuration - Updated API endpoints
-        const API_BASE_URL = 'https://dampdf-railway-production.up.railway.app';
+        // Enhanced Configuration with Railway Backend
+        const API_CONFIG = {
+            BASE_URL: 'https://dampdf-railway-production.up.railway.app',
+            ENDPOINTS: {
+                HEALTH: '/health',
+                UPLOAD: '/api/v1/files/upload',
+                PROCESS: '/api/v1/process/start',
+                STATUS: '/api/v1/process/status',
+                DOWNLOAD: '/api/v1/download/file'
+            },
+            TIMEOUT: 30000, // 30 seconds
+            MAX_RETRIES: 3
+        };
         
+        // Global state management
         let currentTool = '';
         let sessionId = '';
         let downloadUrl = '';
-        let processingInterval = null;
-        let compressionLevel = 'medium'; // Default compression level
+        let errorLog = {
+            timestamp: null,
+            userAgent: navigator.userAgent,
+            url: window.location.href,
+            tool: '',
+            file: null,
+            errors: [],
+            requests: [],
+            responses: [],
+            debugInfo: {}
+        };
 
-        // Enhanced animations and micro-interactions
-        function addClickAnimation(element) {
-            element.style.transform = 'scale(0.98)';
-            setTimeout(() => {
-                element.style.transform = '';
-            }, 150);
-        }
-
-        // Add click listeners for micro-interactions
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add click animations to all clickable elements
-            document.querySelectorAll('.clickable').forEach(element => {
-                element.addEventListener('click', function() {
-                    addClickAnimation(this);
-                });
-            });
-
-            // Animate stats on scroll
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.animation = 'fadeInUp 0.8s ease-out';
-                        entry.target.style.opacity = '1';
-                    }
-                });
-            }, observerOptions);
-
-            // Observe all sections for scroll animations
-            document.querySelectorAll('.tool-card, .feature, .stat').forEach(el => {
-                el.style.opacity = '0';
-                observer.observe(el);
-            });
-        });
-
-        function openTool(toolType, toolName, acceptTypes) {
-            currentTool = toolType;
-            document.getElementById('modalTitle').textContent = toolName;
-            document.getElementById('toolModal').style.display = 'block';
-            document.getElementById('fileInput').accept = acceptTypes;
-            
-            // Show compression level options for compression tools
-            const compressionSection = document.getElementById('compressionLevelSection');
-            if (toolType.includes('compress')) {
-                compressionSection.style.display = 'block';
-            } else {
-                compressionSection.style.display = 'none';
-            }
-            
-            // Add bounce animation to modal
-            document.querySelector('.modal-content').classList.add('bounce-in');
-            setTimeout(() => {
-                document.querySelector('.modal-content').classList.remove('bounce-in');
-            }, 600);
-        }
-
-        function closeModal() {
-            // Clear any ongoing processing
-            if (processingInterval) {
-                clearTimeout(processingInterval);
-                processingInterval = null;
-            }
-            
-            document.getElementById('toolModal').style.display = 'none';
-            resetTool();
-        }
-
-        function resetTool() {
-            // Clear any ongoing polling
-            if (processingInterval) {
-                clearTimeout(processingInterval);
-                processingInterval = null;
-            }
-            
-            // Reset UI state
-            document.getElementById('uploadSection').style.display = 'block';
-            document.getElementById('progressBar').style.display = 'none';
-            document.getElementById('progressText').style.display = 'none';
-            document.getElementById('result').style.display = 'none';
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('fileInput').value = '';
-            
-            // Clear progress
-            document.getElementById('progressFill').style.width = '0%';
-            document.getElementById('progressText').textContent = '';
-            
-            // Reset variables
-            sessionId = '';
-            downloadUrl = '';
-        }
-
-        function showSection(sectionId) {
-            // Hide all sections
-            document.querySelectorAll('.seo-section').forEach(section => {
-                section.style.display = 'none';
-            });
-            
-            // Show selected section
-            const section = document.getElementById(sectionId);
-            if (section) {
-                section.style.display = 'block';
-                section.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        // Enhanced drag and drop with animations
-        document.addEventListener('DOMContentLoaded', function() {
-            const uploadZone = document.getElementById('uploadZone');
-            
-            if (uploadZone) {
-                // Add click handler for upload zone (but not the button)
-                uploadZone.addEventListener('click', function(e) {
-                    // Only trigger file dialog if clicking on the zone itself, not the button
-                    if (e.target === uploadZone || e.target.closest('.upload-zone') === uploadZone) {
-                        if (!e.target.closest('.upload-button')) {
-                            document.getElementById('fileInput').click();
-                        }
-                    }
-                });
+        // Enhanced logging system
+        class Logger {
+            static log(level, message, data = null) {
+                const entry = {
+                    timestamp: new Date().toISOString(),
+                    level,
+                    message,
+                    data: data ? JSON.parse(JSON.stringify(data)) : null
+                };
                 
-                uploadZone.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    uploadZone.classList.add('dragover');
-                });
+                errorLog.errors.push(entry);
+                console[level](message, data);
                 
-                uploadZone.addEventListener('dragleave', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    uploadZone.classList.remove('dragover');
-                });
-                
-                uploadZone.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    uploadZone.classList.remove('dragover');
-                    const files = e.dataTransfer.files;
-                    if (files.length > 0) {
-                        processFile(files[0]);
-                    }
-                });
-            }
-        });
-
-        function handleFileSelect(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            const file = event.target.files[0];
-            if (file) {
-                processFile(file);
-            }
-        }
-
-        async function processFile(file) {
-            try {
-                showError('');
-                
-                // Enhanced file validation with better UX
-                if (file.size > 100 * 1024 * 1024) {
-                    showError('File size exceeds 100MB limit. Please choose a smaller file or contact support for enterprise solutions.');
-                    return;
+                // Update debug display if visible
+                if (document.getElementById('debugInfo').style.display === 'block') {
+                    this.updateDebugDisplay();
                 }
+            }
 
-                // Validate file type based on current tool
-                if (!validateFileType(file, currentTool)) {
-                    showError('Invalid file type for this tool. Please select a supported file format.');
-                    return;
-                }
+            static updateDebugDisplay() {
+                document.getElementById('debugSystem').textContent = JSON.stringify({
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform,
+                    language: navigator.language,
+                    cookieEnabled: navigator.cookieEnabled,
+                    onLine: navigator.onLine,
+                    timestamp: new Date().toISOString()
+                }, null, 2);
 
-                // Smooth transitions
-                document.getElementById('uploadSection').style.display = 'none';
-                document.getElementById('progressBar').style.display = 'block';
-                document.getElementById('progressText').style.display = 'block';
-                
-                updateProgress(10, 'Preparing secure upload...');
+                document.getElementById('debugRequest').textContent = JSON.stringify(
+                    errorLog.requests.slice(-5), null, 2
+                );
 
-                // Real API call to upload file
-                await uploadAndProcessFile(file);
+                document.getElementById('debugResponse').textContent = JSON.stringify(
+                    errorLog.responses.slice(-5), null, 2
+                );
 
-            } catch (error) {
-                console.error('Error:', error);
-                showError(`Processing Error: ${error.message}`);
-                resetTool();
+                document.getElementById('debugNetwork').textContent = JSON.stringify({
+                    backendStatus: document.getElementById('backendStatus').className,
+                    baseUrl: API_CONFIG.BASE_URL,
+                    lastCheck: errorLog.debugInfo.lastHealthCheck
+                }, null, 2);
             }
         }
 
-        async function uploadAndProcessFile(file) {
-            try {
-                // Get selected compression level
-                const selectedLevel = document.querySelector('input[name="compression"]:checked')?.value || 'medium';
-                compressionLevel = selectedLevel;
+        // Enhanced HTTP client with detailed logging
+        class APIClient {
+            static async request(endpoint, options = {}) {
+                const url = `${API_CONFIG.BASE_URL}${endpoint}`;
+                const requestData = {
+                    url,
+                    method: options.method || 'GET',
+                    headers: options.headers || {},
+                    timestamp: new Date().toISOString()
+                };
                 
-                // Upload file to Railway backend - try multiple endpoints
-                updateProgress(20, 'Uploading file to secure servers...');
-                
-                const formData = new FormData();
-                formData.append('file', file);
-                
-                // Try different API endpoints
-                const endpoints = [
-                    `${API_BASE_URL}/upload`,
-                    `${API_BASE_URL}/api/upload`, 
-                    `${API_BASE_URL}/api/v1/upload`,
-                    `${API_BASE_URL}/api/v1/files/upload`
-                ];
-                
-                let uploadResponse = null;
-                let uploadData = null;
-                
-                for (const endpoint of endpoints) {
-                    try {
-                        console.log(`Trying endpoint: ${endpoint}`);
-                        
-                        const url = currentTool ? `${endpoint}?tool_type=${currentTool}` : endpoint;
-                        
-                        uploadResponse = await fetch(url, {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'Accept': 'application/json',
-                            }
-                        });
+                errorLog.requests.push(requestData);
+                Logger.log('info', `Making ${requestData.method} request to ${url}`);
 
-                        if (uploadResponse.ok) {
-                            uploadData = await uploadResponse.json();
-                            console.log('Upload successful:', uploadData);
-                            break;
-                        } else {
-                            console.log(`Endpoint ${endpoint} failed with status:`, uploadResponse.status);
-                        }
-                    } catch (error) {
-                        console.log(`Endpoint ${endpoint} error:`, error.message);
-                        continue;
-                    }
-                }
-
-                if (!uploadResponse || !uploadResponse.ok) {
-                    // Fallback: simulate processing for demo
-                    console.log('All endpoints failed, using demo mode');
-                    await simulateProcessing(file);
-                    return;
-                }
-
-                sessionId = uploadData.session_id || uploadData.id || 'demo_session';
-                
-                updateProgress(40, 'File uploaded successfully. Starting processing...');
-
-                // Start processing
-                const processEndpoints = [
-                    `${API_BASE_URL}/process`,
-                    `${API_BASE_URL}/api/process`,
-                    `${API_BASE_URL}/api/v1/process/start`
-                ];
-                
-                let processResponse = null;
-                
-                for (const endpoint of processEndpoints) {
-                    try {
-                        processResponse = await fetch(endpoint, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                session_id: sessionId,
-                                tool_type: currentTool,
-                                options: getToolOptions()
-                            })
-                        });
-
-                        if (processResponse.ok) {
-                            break;
-                        }
-                    } catch (error) {
-                        console.log(`Process endpoint ${endpoint} error:`, error.message);
-                        continue;
-                    }
-                }
-
-                if (!processResponse || !processResponse.ok) {
-                    // Fallback to simulation
-                    console.log('Process endpoints failed, continuing with simulation');
-                    await simulateProcessing(file);
-                    return;
-                }
-
-                updateProgress(60, 'Processing your file with advanced algorithms...');
-                
-                // Poll for processing status
-                await pollProcessingStatus();
-
-            } catch (error) {
-                console.error('Upload/Process Error:', error);
-                // Fallback to simulation on any error
-                console.log('Falling back to demo mode due to error');
-                await simulateProcessing(file);
-            }
-        }
-
-        async function simulateProcessing(file) {
-            updateProgress(30, 'Processing file (demo mode)...');
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            updateProgress(50, `Applying ${compressionLevel} compression...`);
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            updateProgress(75, 'Optimizing file size...');
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            updateProgress(90, 'Finalizing processed file...');
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            updateProgress(100, 'Processing complete!');
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            // Create simulated download
-            downloadUrl = URL.createObjectURL(file);
-            
-            // Simulate compression results based on level
-            const reductionRates = {
-                'light': Math.floor(Math.random() * 20) + 20, // 20-40%
-                'medium': Math.floor(Math.random() * 30) + 40, // 40-70%
-                'high': Math.floor(Math.random() * 40) + 60  // 60-90%
-            };
-            
-            const statusData = {
-                size_reduction: reductionRates[compressionLevel] || 50,
-                compression_level: compressionLevel
-            };
-            
-            showResult(file.name, statusData);
-        }
-
-        function getToolOptions() {
-            // Get selected compression level
-            const selectedLevel = document.querySelector('input[name="compression"]:checked')?.value || 'medium';
-            
-            switch (currentTool) {
-                case 'image-compress':
-                    const imageQuality = {
-                        'light': 85,
-                        'medium': 70,
-                        'high': 40
-                    };
-                    return { 
-                        quality: imageQuality[selectedLevel],
-                        format: 'auto',
-                        optimization: selectedLevel,
-                        target_size: selectedLevel === 'high' ? 100 : null // Target 100KB for high compression
-                    };
-                case 'pdf-compress':
-                    const pdfSettings = {
-                        'light': { compression_level: 'low', image_quality: 90, dpi: 300 },
-                        'medium': { compression_level: 'medium', image_quality: 70, dpi: 200 },
-                        'high': { compression_level: 'high', image_quality: 40, dpi: 150, target_size: 100 } // Target 100KB
-                    };
-                    return {
-                        ...pdfSettings[selectedLevel],
-                        preserve_bookmarks: true,
-                        remove_metadata: selectedLevel === 'high'
-                    };
-                case 'docx-to-pdf':
-                    return {
-                        preserve_formatting: true,
-                        embed_fonts: selectedLevel !== 'high',
-                        image_quality: selectedLevel === 'high' ? 50 : 80
-                    };
-                case 'xlsx-to-pdf':
-                    return {
-                        preserve_formatting: true,
-                        include_charts: true,
-                        page_orientation: 'auto',
-                        image_quality: selectedLevel === 'high' ? 50 : 80
-                    };
-                default:
-                    return { compression_level: selectedLevel };
-            }
-        }
-
-        async function pollProcessingStatus() {
-            let attempts = 0;
-            const maxAttempts = 120; // 2 minute timeout
-            
-            const statusEndpoints = [
-                `${API_BASE_URL}/status/${sessionId}`,
-                `${API_BASE_URL}/api/status/${sessionId}`,
-                `${API_BASE_URL}/api/v1/process/status/${sessionId}`
-            ];
-            
-            const poll = async () => {
                 try {
-                    let statusResponse = null;
-                    
-                    for (const endpoint of statusEndpoints) {
-                        try {
-                            statusResponse = await fetch(endpoint, {
-                                method: 'GET',
-                                headers: {
-                                    'Accept': 'application/json',
-                                }
-                            });
-                            
-                            if (statusResponse.ok) {
-                                break;
-                            }
-                        } catch (error) {
-                            continue;
-                        }
-                    }
-                    
-                    if (!statusResponse || !statusResponse.ok) {
-                        // Fallback: simulate completion
-                        updateProgress(100, 'Processing complete!');
-                        downloadUrl = `${API_BASE_URL}/download/${sessionId}`;
-                        
-                        const originalFileName = document.getElementById('fileInput').files[0]?.name || 'processed_file';
-                        showResult(originalFileName, { size_reduction: 65 });
-                        return;
-                    }
-                    
-                    const status = await statusResponse.json();
-                    
-                    // Update progress based on status
-                    const progress = Math.min(60 + (attempts * 2), 95);
-                    updateProgress(progress, status.message || 'Processing file...');
-                    
-                    if (status.status === 'completed') {
-                        updateProgress(100, 'Processing complete!');
-                        downloadUrl = `${API_BASE_URL}/download/${sessionId}`;
-                        
-                        const originalFileName = document.getElementById('fileInput').files[0]?.name || 'processed_file';
-                        showResult(originalFileName, status);
-                        
-                    } else if (status.status === 'failed') {
-                        throw new Error(status.error || status.message || 'Processing failed. Please try again with a different file.');
-                        
-                    } else if (status.status === 'processing' || status.status === 'pending') {
-                        attempts++;
-                        if (attempts < maxAttempts) {
-                            processingInterval = setTimeout(poll, 1000);
-                        } else {
-                            throw new Error('Processing is taking longer than expected. Please try again or contact support.');
-                        }
-                    } else {
-                        attempts++;
-                        if (attempts < maxAttempts) {
-                            processingInterval = setTimeout(poll, 1000);
-                        } else {
-                            throw new Error('Processing status unknown. Please try again.');
-                        }
-                    }
-                    
-                } catch (error) {
-                    console.error('Polling Error:', error);
-                    clearTimeout(processingInterval);
-                    throw error;
-                }
-            };
-            
-            await poll();
-        }
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
 
-        function getToolOptions() {
-            switch (currentTool) {
-                case 'image-compress':
-                    return { quality: 70 };
-                case 'pdf-compress':
-                    return { compression_level: 'medium' };
-                default:
-                    return {};
-            }
-        }
-
-        async function pollProcessingStatus() {
-            let attempts = 0;
-            const maxAttempts = 120; // 2 minute timeout for larger files
-            
-            const poll = async () => {
-                try {
-                    const response = await fetch(`${API_BASE_URL}/process/status/${sessionId}`);
-                    
-                    if (!response.ok) {
-                        throw new Error(`Status check failed with status ${response.status}`);
-                    }
-                    
-                    const status = await response.json();
-                    updateProgress(status.progress, status.message || 'Processing...');
-                    
-                    if (status.status === 'completed') {
-                        downloadUrl = `${API_BASE_URL}/download/file/${sessionId}`;
-                        showResult(document.getElementById('fileInput').files[0].name);
-                    } else if (status.status === 'failed') {
-                        throw new Error(status.error || 'Processing failed. Please try again with a different file.');
-                    } else if (attempts < maxAttempts) {
-                        attempts++;
-                        setTimeout(poll, 1000);
-                    } else {
-                        throw new Error('Processing is taking longer than expected. Please try again or contact support.');
-                    }
-                } catch (error) {
-                    showError(`Processing Error: ${error.message}`);
-                    resetTool();
-                }
-            };
-            
-            poll();
-        }
-
-        function updateProgress(percent, message) {
-            document.getElementById('progressFill').style.width = percent + '%';
-            document.getElementById('progressText').textContent = `${percent}% - ${message}`;
-            
-            // Add pulse animation at key milestones
-            if (percent === 50 || percent === 100) {
-                document.getElementById('progressBar').style.animation = 'pulse 0.5s ease-in-out';
-                setTimeout(() => {
-                    document.getElementById('progressBar').style.animation = '';
-                }, 500);
-            }
-        }
-
-        function showResult(originalFileName, statusData = {}) {
-            document.getElementById('progressBar').style.display = 'none';
-            document.getElementById('progressText').style.display = 'none';
-            document.getElementById('result').style.display = 'block';
-            
-            const toolAction = currentTool.includes('compress') ? 'compressed' : 'converted';
-            
-            // Get compression level info
-            const levelNames = {
-                'light': 'Light Compression',
-                'medium': 'Medium Compression', 
-                'high': 'High Compression'
-            };
-            const levelName = levelNames[compressionLevel] || 'Medium Compression';
-            
-            // Try to get actual file size reduction from status data
-            let sizeInfo = '';
-            if (statusData.original_size && statusData.processed_size) {
-                const reduction = Math.round((1 - statusData.processed_size / statusData.original_size) * 100);
-                const finalSize = formatFileSize(statusData.processed_size);
-                sizeInfo = `${levelName} applied - ${reduction}% reduction (Final size: ${finalSize})`;
-                
-                if (compressionLevel === 'high' && statusData.processed_size < 100000) {
-                    sizeInfo += ` ✅ Under 100KB target achieved!`;
-                }
-            } else if (statusData.size_reduction) {
-                sizeInfo = `${levelName} applied - ${statusData.size_reduction}% size reduction`;
-                
-                if (compressionLevel === 'high') {
-                    sizeInfo += ` 🎯 Optimized for minimum file size`;
-                }
-            } else if (toolAction === 'compressed') {
-                sizeInfo = `${levelName} applied successfully`;
-            } else {
-                sizeInfo = 'File converted successfully';
-            }
-            
-            document.getElementById('resultText').innerHTML = `
-                <strong>Success!</strong> Your file "${originalFileName}" has been ${toolAction} successfully!<br>
-                <small style="color: var(--text-secondary);">${sizeInfo}</small><br>
-                <small style="color: var(--text-secondary); margin-top: 5px; display: block;">Files are automatically deleted after 1 hour for your privacy.</small>
-            `;
-            
-            // Add success animation
-            document.getElementById('result').style.animation = 'bounceIn 0.6s ease-out';
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-        }
-
-        function downloadFile() {
-            if (downloadUrl) {
-                // Create download link and trigger download
-                const link = document.createElement('a');
-                link.href = downloadUrl;
-                
-                // Set proper download attributes
-                link.setAttribute('download', ''); // Let browser handle filename from server
-                link.setAttribute('target', '_blank'); // Open in new tab as fallback
-                
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                // Show download feedback
-                const downloadBtn = document.getElementById('downloadButton');
-                const originalText = downloadBtn.textContent;
-                downloadBtn.textContent = 'Downloaded! ✓';
-                downloadBtn.style.background = '#4caf50';
-                
-                setTimeout(() => {
-                    downloadBtn.textContent = originalText;
-                    downloadBtn.style.background = '#4caf50';
-                }, 3000);
-            } else {
-                showError('Download link not available. Please try processing the file again.');
-            }
-        }
-
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            if (message) {
-                errorDiv.innerHTML = `<strong>⚠️ Error:</strong> ${message}`;
-                errorDiv.style.display = 'block';
-                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else {
-                errorDiv.style.display = 'none';
-            }
-        }
-
-        function formatDate(date) {
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}${month}${year}`;
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('toolModal');
-            if (event.target === modal) {
-                closeModal();
-            }
-        }
-
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
+                    const response = await fetch(url, {
+                        ...options,
+                        signal: controller.signal
                     });
-                }
-            });
-        });
 
-        // Enhanced keyboard navigation
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && document.getElementById('toolModal').style.display === 'block') {
-                closeModal();
-            }
-        });
-    </script>
-</body>
-</html>
+                    clearTimeout(timeoutId);
+
+                    const responseData = {
+                        url,
+                        status: response.status,
+                        statusText: response.statusText,
+                        headers: Object.fromEntries(response.headers.entries()),
+                        timestamp: new Date().toISOString()
+                    };
+
+                    errorLog.responses.push(responseData);
+
+                    if (!response.ok) {
+                        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                        try {
+                            const errorBody = await response.text();
+                            responseData.body = errorBody;
+                            
+                            // Try to parse as JSON for structured error
+                            try {
+                                const parsedError = JSON.parse(errorBody);
+                                errorMessage = parsedError.error?.message || parsedError.message || errorMessage;
+                                responseData.parsedBody = parsedError;
+                            } catch (e) {
+                                // Not JSON, keep as text
+                            }
+                        } catch (e) {
+                            responseData.body = 'Could not read response body';
+                        }
+
+                        throw new APIError(errorMessage, response.status, responseData);
+                    }
+
+                    Logger.log('info', `Request successful: ${response.status}`);
+                    return response;
+
+                }
