@@ -866,3 +866,433 @@
                     <p style="color: var(--text-secondary); margin-bottom: 20px;">or click to browse from your computer</p>
                     <button class="upload-button clickable" onclick="document.getElementById('fileInput').click()">
                         Choose File
+                    </button>
+                </div>
+                <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event)">
+                <p style="font-size: 14px; color: var(--text-secondary); text-align: center; margin-top: 15px;">
+                    ✓ Maximum file size: 100MB &nbsp;&nbsp; ✓ Secure SSL encryption &nbsp;&nbsp; ✓ Auto-delete after 1 hour
+                </p>
+            </div>
+            
+            <!-- Enhanced Error Display -->
+            <div id="errorContainer" class="error-container">
+                <div class="error-header">
+                    <div class="error-icon">⚠️</div>
+                    <div class="error-title">Processing Error</div>
+                </div>
+                <div id="errorMessage" class="error-message"></div>
+                <div class="error-actions">
+                    <button class="error-action-btn primary" onclick="retryConnection()">
+                        🔄 Retry Connection
+                    </button>
+                    <button class="error-action-btn secondary" onclick="resetTool()">
+                        ↩️ Try Again
+                    </button>
+                    <button class="error-action-btn secondary" onclick="reportIssue()">
+                        📧 Report Issue
+                    </button>
+                </div>
+            </div>
+            
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p id="progressText" style="text-align: center; margin: 10px 0; display: none; font-weight: 600;"></p>
+            
+            <div id="result" style="display: none; text-align: center; padding: 20px;">
+                <div style="font-size: 48px; margin-bottom: 20px;">✅</div>
+                <h3 style="color: #4caf50; margin-bottom: 15px;">Processing Complete!</h3>
+                <p id="resultText" style="margin-bottom: 25px;"></p>
+                <button class="upload-button clickable" id="downloadButton" onclick="downloadFile()" style="background: #4caf50; margin-right: 10px;">
+                    Download File
+                </button>
+                <button class="upload-button clickable" onclick="resetTool()" style="background: #666;">
+                    Process Another File
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced Configuration with Railway Backend
+        const API_CONFIG = {
+            BASE_URL: 'https://dampdf-railway-production.up.railway.app',
+            ENDPOINTS: {
+                HEALTH: '/health',
+                UPLOAD: '/api/upload',
+                PROCESS: '/api/process',
+                DOWNLOAD: '/api/download'
+            },
+            TIMEOUT: 30000,
+            MAX_RETRIES: 3
+        };
+        
+        // Global state management
+        let currentTool = '';
+        let processedFileUrl = '';
+        let isProcessing = false;
+
+        // Custom error class for better error handling
+        class APIError extends Error {
+            constructor(message, status, response) {
+                super(message);
+                this.name = 'APIError';
+                this.status = status;
+                this.response = response;
+            }
+        }
+
+        // Enhanced HTTP client with proper CORS handling
+        class APIClient {
+            static async request(endpoint, options = {}) {
+                const url = `${API_CONFIG.BASE_URL}${endpoint}`;
+                
+                console.log(`Making ${options.method || 'GET'} request to:`, url);
+
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
+
+                    const response = await fetch(url, {
+                        ...options,
+                        signal: controller.signal,
+                        mode: 'cors',
+                        headers: {
+                            'Accept': 'application/json',
+                            ...options.headers
+                        }
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    console.log(`Response status: ${response.status}`);
+
+                    if (!response.ok) {
+                        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                        try {
+                            const errorBody = await response.text();
+                            const parsedError = JSON.parse(errorBody);
+                            errorMessage = parsedError.error || parsedError.message || errorMessage;
+                        } catch (e) {
+                            // Keep original error message if parsing fails
+                        }
+                        throw new APIError(errorMessage, response.status, response);
+                    }
+
+                    return response;
+
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        throw new APIError('Request timeout - please try again', 408);
+                    }
+                    if (error instanceof APIError) {
+                        throw error;
+                    }
+                    // Network errors
+                    throw new APIError(`Network error: ${error.message}`, 0);
+                }
+            }
+
+            static async healthCheck() {
+                try {
+                    const response = await this.request(API_CONFIG.ENDPOINTS.HEALTH);
+                    const data = await response.json();
+                    return { healthy: true, data };
+                } catch (error) {
+                    return { healthy: false, error: error.message };
+                }
+            }
+
+            static async uploadFile(file, toolType) {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('tool', toolType);
+
+                return await this.request(API_CONFIG.ENDPOINTS.UPLOAD, {
+                    method: 'POST',
+                    body: formData
+                });
+            }
+
+            static async processFile(fileId, toolType, options = {}) {
+                return await this.request(API_CONFIG.ENDPOINTS.PROCESS, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fileId,
+                        tool: toolType,
+                        options
+                    })
+                });
+            }
+        }
+
+        // Backend monitoring system
+        class BackendMonitor {
+            static async checkHealth() {
+                const statusIndicator = document.getElementById('backendStatus');
+                
+                statusIndicator.className = 'status-indicator checking';
+                statusIndicator.innerHTML = '<div class="status-dot"></div><span>Checking...</span>';
+
+                try {
+                    const result = await APIClient.healthCheck();
+                    
+                    if (result.healthy) {
+                        statusIndicator.className = 'status-indicator online';
+                        statusIndicator.innerHTML = '<div class="status-dot"></div><span>Backend Online</span>';
+                        statusIndicator.title = `Backend is healthy - ${result.data?.service || 'DamPDF API'}`;
+                        return true;
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } catch (error) {
+                    statusIndicator.className = 'status-indicator offline';
+                    statusIndicator.innerHTML = '<div class="status-dot"></div><span>Backend Offline</span>';
+                    statusIndicator.title = `Backend Error: ${error.message}`;
+                    console.error('Backend health check failed:', error);
+                    return false;
+                }
+            }
+        }
+
+        // File processing manager
+        class FileProcessor {
+            static async upload(file, toolType) {
+                if (isProcessing) {
+                    throw new Error('Another file is currently being processed');
+                }
+
+                isProcessing = true;
+                this.updateProgress(0, 'Preparing upload...');
+                
+                try {
+                    // Validate file
+                    this.validateFile(file, toolType);
+                    
+                    this.updateProgress(20, 'Uploading file...');
+                    
+                    const uploadResponse = await APIClient.uploadFile(file, toolType);
+                    const uploadData = await uploadResponse.json();
+                    
+                    this.updateProgress(50, 'Processing file...');
+                    
+                    const processResponse = await APIClient.processFile(uploadData.fileId, toolType);
+                    const processData = await processResponse.json();
+                    
+                    this.updateProgress(90, 'Finalizing...');
+                    
+                    // Store the download URL
+                    processedFileUrl = processData.downloadUrl || `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DOWNLOAD}/${processData.fileId}`;
+                    
+                    this.updateProgress(100, 'Complete!');
+                    this.showSuccess(processData);
+                    
+                } catch (error) {
+                    this.showError(error);
+                } finally {
+                    isProcessing = false;
+                }
+            }
+
+            static validateFile(file, toolType) {
+                const maxSize = 100 * 1024 * 1024; // 100MB
+                
+                if (file.size > maxSize) {
+                    throw new Error(`File size exceeds 100MB limit. Your file is ${(file.size / 1024 / 1024).toFixed(1)}MB`);
+                }
+
+                const validTypes = {
+                    'image-compress': ['image/jpeg', 'image/png', 'image/webp'],
+                    'pdf-compress': ['application/pdf'],
+                    'docx-to-pdf': ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'],
+                    'xlsx-to-pdf': ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel']
+                };
+
+                if (validTypes[toolType] && !validTypes[toolType].includes(file.type)) {
+                    throw new Error(`Invalid file type. Expected: ${validTypes[toolType].join(', ')}`);
+                }
+            }
+
+            static updateProgress(percent, message) {
+                const progressBar = document.getElementById('progressBar');
+                const progressFill = document.getElementById('progressFill');
+                const progressText = document.getElementById('progressText');
+
+                progressBar.style.display = 'block';
+                progressFill.style.width = `${percent}%`;
+                progressText.style.display = 'block';
+                progressText.textContent = message;
+            }
+
+            static showSuccess(data) {
+                document.getElementById('uploadSection').style.display = 'none';
+                document.getElementById('progressBar').style.display = 'none';
+                document.getElementById('progressText').style.display = 'none';
+                
+                const result = document.getElementById('result');
+                const resultText = document.getElementById('resultText');
+                
+                resultText.textContent = `File processed successfully! Original size: ${data.originalSize || 'Unknown'}, New size: ${data.newSize || 'Unknown'}`;
+                result.style.display = 'block';
+            }
+
+            static showError(error) {
+                console.error('File processing error:', error);
+                
+                const errorContainer = document.getElementById('errorContainer');
+                const errorMessage = document.getElementById('errorMessage');
+                
+                errorMessage.textContent = error.message || 'An unexpected error occurred';
+                errorContainer.style.display = 'block';
+                
+                // Hide progress elements
+                document.getElementById('progressBar').style.display = 'none';
+                document.getElementById('progressText').style.display = 'none';
+            }
+        }
+
+        // UI Functions
+        function openTool(toolType, title, acceptTypes) {
+            currentTool = toolType;
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('fileInput').accept = acceptTypes;
+            document.getElementById('toolModal').style.display = 'block';
+            
+            // Reset modal state
+            resetTool();
+        }
+
+        function closeModal() {
+            document.getElementById('toolModal').style.display = 'none';
+            resetTool();
+        }
+
+        function resetTool() {
+            // Reset all modal elements
+            document.getElementById('uploadSection').style.display = 'block';
+            document.getElementById('errorContainer').style.display = 'none';
+            document.getElementById('progressBar').style.display = 'none';
+            document.getElementById('progressText').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
+            
+            // Clear file input
+            document.getElementById('fileInput').value = '';
+            
+            // Reset global state
+            processedFileUrl = '';
+            isProcessing = false;
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        }
+
+        async function processFile(file) {
+            try {
+                await FileProcessor.upload(file, currentTool);
+            } catch (error) {
+                console.error('Error processing file:', error);
+            }
+        }
+
+        function downloadFile() {
+            if (processedFileUrl) {
+                const a = document.createElement('a');
+                a.href = processedFileUrl;
+                a.download = 'processed-file';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } else {
+                alert('No file available for download');
+            }
+        }
+
+        function retryConnection() {
+            BackendMonitor.checkHealth();
+            document.getElementById('errorContainer').style.display = 'none';
+        }
+
+        function reportIssue() {
+            const subject = encodeURIComponent('DamPDF Issue Report');
+            const body = encodeURIComponent(`Please describe the issue you encountered:\n\nTool: ${currentTool}\nBrowser: ${navigator.userAgent}\nTime: ${new Date().toISOString()}`);
+            window.open(`mailto:support@dampdf.com?subject=${subject}&body=${body}`);
+        }
+
+        // Drag and drop functionality
+        function setupDragAndDrop() {
+            const uploadZone = document.getElementById('uploadZone');
+            
+            uploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadZone.classList.add('dragover');
+            });
+            
+            uploadZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+            });
+            
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    processFile(files[0]);
+                }
+            });
+
+            // Make upload zone clickable
+            uploadZone.addEventListener('click', () => {
+                document.getElementById('fileInput').click();
+            });
+        }
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DamPDF Frontend Loaded');
+            
+            // Initial backend health check
+            BackendMonitor.checkHealth();
+            
+            // Setup drag and drop
+            setupDragAndDrop();
+            
+            // Periodic health checks
+            setInterval(() => {
+                BackendMonitor.checkHealth();
+            }, 60000); // Check every minute
+            
+            // Close modal when clicking outside
+            window.onclick = function(event) {
+                const modal = document.getElementById('toolModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+            
+            // Network status monitoring
+            window.addEventListener('online', () => {
+                console.log('Network connection restored');
+                BackendMonitor.checkHealth();
+            });
+
+            window.addEventListener('offline', () => {
+                console.log('Network connection lost');
+                const statusIndicator = document.getElementById('backendStatus');
+                statusIndicator.className = 'status-indicator offline';
+                statusIndicator.innerHTML = '<div class="status-dot"></div><span>Offline</span>';
+            });
+
+            console.log('DamPDF application initialized successfully');
+        });
+    </script>
+</body>
+</html>
