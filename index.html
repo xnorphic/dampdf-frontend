@@ -914,14 +914,15 @@
     </div>
 
     <script>
-        // Enhanced Configuration with Railway Backend
+        // Enhanced Configuration with Railway Backend - Fixed Endpoints
         const API_CONFIG = {
             BASE_URL: 'https://dampdf-railway-production.up.railway.app',
             ENDPOINTS: {
                 HEALTH: '/health',
-                UPLOAD: '/api/upload',
-                PROCESS: '/api/process',
-                DOWNLOAD: '/api/download'
+                UPLOAD: '/api/v1/files/upload',
+                PROCESS: '/api/v1/process/start',
+                STATUS: '/api/v1/process/status',
+                DOWNLOAD: '/api/v1/download/file'
             },
             TIMEOUT: 30000,
             MAX_RETRIES: 3
@@ -1006,7 +1007,7 @@
             static async uploadFile(file, toolType) {
                 const formData = new FormData();
                 formData.append('file', file);
-                formData.append('tool', toolType);
+                formData.append('tool_type', toolType);
 
                 return await this.request(API_CONFIG.ENDPOINTS.UPLOAD, {
                     method: 'POST',
@@ -1014,18 +1015,22 @@
                 });
             }
 
-            static async processFile(fileId, toolType, options = {}) {
+            static async processFile(sessionId, toolType, options = {}) {
                 return await this.request(API_CONFIG.ENDPOINTS.PROCESS, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        fileId,
-                        tool: toolType,
+                        session_id: sessionId,
+                        tool_type: toolType,
                         options
                     })
                 });
+            }
+
+            static async getProcessStatus(sessionId) {
+                return await this.request(`${API_CONFIG.ENDPOINTS.STATUS}/${sessionId}`);
             }
         }
 
@@ -1077,24 +1082,60 @@
                     const uploadResponse = await APIClient.uploadFile(file, toolType);
                     const uploadData = await uploadResponse.json();
                     
-                    this.updateProgress(50, 'Processing file...');
+                    this.updateProgress(50, 'Starting processing...');
                     
-                    const processResponse = await APIClient.processFile(uploadData.fileId, toolType);
+                    // Start processing with session_id from upload
+                    const processResponse = await APIClient.processFile(uploadData.session_id, toolType);
                     const processData = await processResponse.json();
                     
-                    this.updateProgress(90, 'Finalizing...');
+                    this.updateProgress(70, 'Processing file...');
                     
-                    // Store the download URL
-                    processedFileUrl = processData.downloadUrl || `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DOWNLOAD}/${processData.fileId}`;
+                    // Poll for completion
+                    await this.pollForCompletion(uploadData.session_id);
                     
                     this.updateProgress(100, 'Complete!');
-                    this.showSuccess(processData);
+                    this.showSuccess({
+                        session_id: uploadData.session_id,
+                        originalSize: 'Unknown',
+                        newSize: 'Compressed'
+                    });
                     
                 } catch (error) {
                     this.showError(error);
                 } finally {
                     isProcessing = false;
                 }
+            }
+
+            static async pollForCompletion(sessionId, maxAttempts = 30) {
+                for (let i = 0; i < maxAttempts; i++) {
+                    try {
+                        const statusResponse = await APIClient.getProcessStatus(sessionId);
+                        const statusData = await statusResponse.json();
+                        
+                        if (statusData.status === 'completed') {
+                            processedFileUrl = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DOWNLOAD}/${sessionId}`;
+                            return statusData;
+                        } else if (statusData.status === 'failed') {
+                            throw new Error(statusData.error || 'Processing failed');
+                        }
+                        
+                        // Update progress based on status
+                        const progress = 70 + (i / maxAttempts) * 20;
+                        this.updateProgress(progress, `Processing... (${statusData.status})`);
+                        
+                        // Wait 2 seconds before next check
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        
+                    } catch (error) {
+                        if (i === maxAttempts - 1) {
+                            throw error;
+                        }
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    }
+                }
+                
+                throw new Error('Processing timeout - please try again');
             }
 
             static validateFile(file, toolType) {
